@@ -2,7 +2,14 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import "./todo.css";
-import { addToDo, setFilter } from "../store/action";
+import {
+  addToDo,
+  setFilter,
+  toggleToDo,
+  removeTodo,
+  clearCompleted,
+  toggleAll
+} from "../store/action";
 import { SHOW_COMPLETED, SHOW_ACTIVE, SHOW_ALL } from "../store/constant";
 
 class ToDo extends Component {
@@ -13,15 +20,6 @@ class ToDo extends Component {
     this.showActive = this.showActive.bind(this);
     this.showCompleted = this.showCompleted.bind(this);
     this.clearCompleted = this.clearCompleted.bind(this);
-    this.toggleAll = this.toggleAll.bind(this);
-    this.state = {
-      // footerFlag: 1,
-      toggleAll: false,
-      // activeBtn: "all",
-      // taskList: [],
-      toBeDone: [],
-      completed: []
-    };
   }
 
   addToTable(e) {
@@ -33,38 +31,33 @@ class ToDo extends Component {
   }
 
   removeItem(index) {
-    console.log(index);
+    this.props.removeTodo(index);
   }
 
-  toggleTaskStatus(item, index) {
-    console.log(item);
+  toggleIndividualTodo(item, index) {
+    this.props.toggleToDo({ ...item, index });
   }
 
-  changeToggleAllStatus() {
-    console.log("change toggle Status");
-  }
-
-  toggleAll() {
-    console.log("toggle All");
+  toggleAll(checked) {
+    console.log("toggle All", checked);
+    this.props.toggleAll(checked);
   }
 
   showAll() {
-    console.log("showAll");
     this.props.setFilter(SHOW_ALL);
   }
 
   showActive() {
-    console.log("showActive");
     this.props.setFilter(SHOW_ACTIVE);
   }
 
   showCompleted() {
-    console.log("showCompleted");
     this.props.setFilter(SHOW_COMPLETED);
   }
 
   clearCompleted() {
-    console.log("clear completed");
+    this.props.clearCompleted();
+    this.props.setFilter(SHOW_ALL);
   }
 
   componentDidMount() {
@@ -72,7 +65,9 @@ class ToDo extends Component {
   }
 
   render() {
-    console.log(this.state);
+    const isToggleAllChecked =
+      this.props.originalList.length ===
+      this.props.todos.filter(elem => elem.completed).length;
     return (
       <section className="App-page">
         <h1>todos</h1>
@@ -90,8 +85,8 @@ class ToDo extends Component {
                 type="checkbox"
                 id="toggle-all"
                 className="toggle-all"
-                checked={this.state.toggleAll}
-                onChange={this.toggleAll}
+                checked={isToggleAllChecked}
+                onChange={() => this.toggleAll(isToggleAllChecked)}
               />
               <label htmlFor="toggle-all" />
               <ul className="todo-list">
@@ -102,7 +97,7 @@ class ToDo extends Component {
                       id={`task-${index}`}
                       className="toggle"
                       checked={item.completed}
-                      onChange={() => this.toggleTaskStatus(item, index)}
+                      onChange={() => this.toggleIndividualTodo(item, index)}
                     />
                     <label
                       htmlFor={`task-${index}`}
@@ -157,7 +152,8 @@ class ToDo extends Component {
               >
                 Completed
               </button>
-              {this.state.completed.length !== 0 ? (
+              {this.props.originalList.filter(todo => todo.completed).length >
+              0 ? (
                 <button
                   className="clear-completed"
                   onClick={this.clearCompleted}
@@ -179,6 +175,11 @@ class ToDo extends Component {
 
 ToDo.propTypes = {
   addToDo: PropTypes.func,
+  setFilter: PropTypes.func,
+  toggleToDo: PropTypes.func,
+  clearCompleted: PropTypes.func,
+  removeTodo: PropTypes.func,
+  toggleAll: PropTypes.func,
   todos: PropTypes.array,
   activeFilter: PropTypes.string,
   originalList: PropTypes.array
@@ -202,7 +203,11 @@ const mapStateToProps = state => {
 };
 const mapDispatchToProps = dispatch => ({
   addToDo: data => dispatch(addToDo(data)),
-  setFilter: filter => dispatch(setFilter(filter))
+  setFilter: filter => dispatch(setFilter(filter)),
+  toggleToDo: todo => dispatch(toggleToDo(todo)),
+  removeTodo: index => dispatch(removeTodo(index)),
+  clearCompleted: () => dispatch(clearCompleted()),
+  toggleAll: checked => dispatch(toggleAll(checked))
 });
 
 export default connect(
