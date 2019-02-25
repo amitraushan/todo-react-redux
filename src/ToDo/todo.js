@@ -24,7 +24,11 @@ class ToDo extends Component {
 
   addToTable(e) {
     if (e.keyCode === 13 && e.target.value) {
-      let obj = { value: e.target.value, completed: false };
+      let obj = {
+        value: e.target.value,
+        completed: false,
+        id: Math.random()
+      };
       this.props.addToDo(obj);
       e.target.value = "";
     }
@@ -34,8 +38,8 @@ class ToDo extends Component {
     this.props.removeTodo(index);
   }
 
-  toggleIndividualTodo(item, index) {
-    this.props.toggleToDo({ ...item, index });
+  toggleIndividualTodo(item) {
+    this.props.toggleToDo({ ...item });
   }
 
   toggleAll(checked) {
@@ -97,7 +101,7 @@ class ToDo extends Component {
                       id={`task-${index}`}
                       className="toggle"
                       checked={item.completed}
-                      onChange={() => this.toggleIndividualTodo(item, index)}
+                      onChange={() => this.toggleIndividualTodo(item)}
                     />
                     <label
                       htmlFor={`task-${index}`}
@@ -109,7 +113,7 @@ class ToDo extends Component {
                     </label>
                     <button
                       className="destroy"
-                      onClick={() => this.removeItem(index)}
+                      onClick={() => this.removeItem(item)}
                     >
                       X
                     </button>
@@ -184,6 +188,7 @@ ToDo.propTypes = {
   activeFilter: PropTypes.string,
   originalList: PropTypes.array
 };
+
 const getVisibleTodos = (todos, filter) => {
   switch (filter) {
     case SHOW_COMPLETED:
@@ -194,6 +199,7 @@ const getVisibleTodos = (todos, filter) => {
       return todos;
   }
 };
+/*Connects redux state to props of react component */
 const mapStateToProps = state => {
   return {
     originalList: state.todos,
@@ -201,6 +207,7 @@ const mapStateToProps = state => {
     activeFilter: state.filter
   };
 };
+/* connects redux actions to react props */
 const mapDispatchToProps = dispatch => ({
   addToDo: data => dispatch(addToDo(data)),
   setFilter: filter => dispatch(setFilter(filter)),

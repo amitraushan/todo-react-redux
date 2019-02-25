@@ -27,14 +27,15 @@ const todos = (state = initialState, action) => {
           ...state.todos,
           {
             value: action.data.value,
-            completed: false
+            completed: false,
+            id: action.data.id
           }
         ]
       };
     case TOGGLE_TODO:
       return Object.assign({}, state, {
-        todos: state.todos.map((todo, index) => {
-          if (index === action.task.index) {
+        todos: state.todos.map(todo => {
+          if (todo.id === action.task.id) {
             return Object.assign({}, todo, {
               completed: !todo.completed
             });
@@ -45,7 +46,7 @@ const todos = (state = initialState, action) => {
     case REMOVE_TODO:
       return {
         ...state,
-        todos: state.todos.filter((todo, index) => action.index !== index)
+        todos: state.todos.filter(todo => action.index.id !== todo.id)
       };
     case CLEAR_COMPLETED:
       return {
