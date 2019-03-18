@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import Checkbox from '@material-ui/core/Checkbox';
+
 import "./todo.css";
 import {
   addToDo,
@@ -96,8 +98,7 @@ class ToDo extends Component {
               <ul className="todo-list">
                 {this.props.todos.map((item, index) => (
                   <li key={index} className="view">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       id={`task-${index}`}
                       className="toggle"
                       checked={item.completed}
@@ -186,7 +187,8 @@ ToDo.propTypes = {
   toggleAll: PropTypes.func,
   todos: PropTypes.array,
   activeFilter: PropTypes.string,
-  originalList: PropTypes.array
+  originalList: PropTypes.array,
+  classes: PropTypes.object.isRequired
 };
 
 const getVisibleTodos = (todos, filter) => {
